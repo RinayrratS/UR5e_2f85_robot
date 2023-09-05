@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/ur5/ksjj_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/ur5/ksjj_ws/src/ur5e_gripper/include/**",
+        "/home/ur5/ksjj_ws/src/Universal_Robots_ROS_Driver/ur_calibration/include/**",
+        "/home/ur5/ksjj_ws/src/universal_robot/ur_kinematics/include/**",
+        "/home/ur5/ksjj_ws/src/Universal_Robots_ROS_Driver/ur_robot_driver/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
