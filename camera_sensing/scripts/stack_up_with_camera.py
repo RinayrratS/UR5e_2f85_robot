@@ -3,6 +3,7 @@
 # Python 2/3 compatibility imports
 from __future__ import print_function
 from six.moves import input
+from get_data import Depth_Camera
 
 import sys
 import copy
@@ -14,6 +15,10 @@ import geometry_msgs.msg
 import robotiq_gripper_msgs.msg
 import time
 import actionlib
+import cv2
+import pyrealsense2 as rs
+import numpy as np
+import threading
 
 try:
     from math import pi, tau, dist, fabs, cos
@@ -292,21 +297,21 @@ class MoveGroupPythonInterfaceTutorial(object):
             seconds2 = rospy.get_time()
 
 
-    def pick_and_place(self, length1: object, length2: object, length3: object, height: object) -> object:
+    def pick_and_place(self, xaxis: object, yaxis: object, zaxis: object, goal_zaxis: object) -> object:
 
-        self.linear_motion_absolute(length1, length2, height + 0.15)
+        self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
         time.sleep(1)
-        self.linear_motion_absolute(length1, length2, length3)
+        self.linear_motion_absolute(xaxis, yaxis, zaxis)
         self.gripper_close()
         time.sleep(1)
-        self.linear_motion_absolute(length1, length2, height + 0.15)
+        self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
         initial_pose = self.move_group.get_current_pose().pose
 
-        self.go_to_goal_state(height + 0.15)
-        self.go_to_goal_state(height+0.0015)
+        self.go_to_goal_state(goal_zaxis + 0.15)
+        self.go_to_goal_state(goal_zaxis+0.0015)
         self.gripper_open()
         time.sleep(1)
-        self.go_to_goal_state(height + 0.15)
+        self.go_to_goal_state(goal_zaxis + 0.15)
 
         #final_pose = self.move_group.get_current_pose().pose
         #if initial_pose.position.x == length1 and initial_pose.position.y == length2:
@@ -319,7 +324,7 @@ class MoveGroupPythonInterfaceTutorial(object):
         column_num = 0
         count = 0
         box_height = 0.04
-        height = 0.78
+        goal_height = 0.78
 
         # initial axis
         row_length = 0.5
@@ -332,14 +337,41 @@ class MoveGroupPythonInterfaceTutorial(object):
             while column_num < columns:
                 column_length += column_num * 0.1
 
-                self.pick_and_place(row_length, column_length, 0.78, height)
+                self.pick_and_place(row_length, column_length, 0.78, goal_height)
                 column_num += 1
                 count += 1
                 print(count, "block pick and place complete!")
-                height = 0.78 + (count * box_height)
+                goal_height = 0.78 + (count * box_height)
                 input("============ Press `Enter` to move on")
             row_num += 1
 
+
+
+
+    def execute_data():
+        # while 추가해야함
+
+        depth_camera = Depth_Camera()
+        depth_camera.execute()
+
+    def get_depth(self):
+        depth_camera = Depth_Camera()
+        self.depth_data = depth_camera.get_depth_data()
+        return self.depth_data
+
+    def yolo_stacking(self):
+        row_axis=
+        column_axis=
+        current_zaxis=
+        goal_zaxis=
+        box_height = 0.04
+        block_count=
+        count = 0
+        depth_data = self.get_depth()
+
+        while(block_count!=0):
+            self.pick_and_place(row_axis, column_axis, current_zaxis-depth_data, goal_zaxis)
+            goal_zaxis = 0.78 + (count * box_height)
 
 
 
@@ -351,10 +383,17 @@ def main():
         print("-----------------------------------")
         print("")
 
+        #depth_camera = Depth_Camera()
+        # execute 메서드를 호출하여 데이터 수집 시작
+        #depth_camera.execute()
+        
+        get_depth()
+
         input(
             "============ Press `Enter` to initialize the pose of robot ..."
         )
         tutorial = MoveGroupPythonInterfaceTutorial()
+
         tutorial.go_to_home_state()
         tutorial.gripper_open()
 
