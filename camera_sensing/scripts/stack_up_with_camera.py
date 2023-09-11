@@ -1,17 +1,12 @@
-<<<<<<< HEAD
-#!/usr/bin/env python
-=======
+#stack_up_with_camera.py
+
 #!/usr/bin/env python3
->>>>>>> getting depth data
 
 # Python 2/3 compatibility imports
 from __future__ import print_function
 from six.moves import input
 from get_data import Depth_Camera
-<<<<<<< HEAD
-=======
 from detect_simple import DetectionResult
->>>>>>> getting depth data
 
 import sys
 import copy
@@ -308,30 +303,16 @@ class MoveGroupPythonInterfaceTutorial(object):
     def pick_and_place(self, xaxis: object, yaxis: object, zaxis: object, goal_zaxis: object) -> object:
 
         self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
-<<<<<<< HEAD
-        time.sleep(1)
-        self.linear_motion_absolute(xaxis, yaxis, zaxis)
-        self.gripper_close()
-        time.sleep(1)
-        self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
-        initial_pose = self.move_group.get_current_pose().pose
-=======
         self.linear_motion_absolute(xaxis, yaxis, zaxis)
         self.gripper_close()
         self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
         #initial_pose = self.move_group.get_current_pose().pose
->>>>>>> getting depth data
 
         self.go_to_goal_state(goal_zaxis + 0.15)
         self.go_to_goal_state(goal_zaxis+0.0015)
         self.gripper_open()
-<<<<<<< HEAD
-        time.sleep(1)
-        self.go_to_goal_state(goal_zaxis + 0.15)
-=======
         self.go_to_goal_state(goal_zaxis + 0.15)
         time.sleep(2)
->>>>>>> getting depth data
 
         #final_pose = self.move_group.get_current_pose().pose
         #if initial_pose.position.x == length1 and initial_pose.position.y == length2:
@@ -366,8 +347,6 @@ class MoveGroupPythonInterfaceTutorial(object):
             row_num += 1
 
 
-<<<<<<< HEAD
-=======
     def yolo_stack(self, x_axis: object, y_axis: object, z_axis: object, goal_z: object) -> object:
 
         row_num = 0
@@ -394,7 +373,6 @@ class MoveGroupPythonInterfaceTutorial(object):
                 goal_height = 0.78 + (count * box_height)
                 input("============ Press `Enter` to move on")
             row_num += 1
->>>>>>> getting depth data
 
 
     def execute_data():
@@ -403,30 +381,12 @@ class MoveGroupPythonInterfaceTutorial(object):
         depth_camera = Depth_Camera()
         depth_camera.execute()
 
-<<<<<<< HEAD
-=======
 
->>>>>>> getting depth data
     def get_depth(self):
         depth_camera = Depth_Camera()
         self.depth_data = depth_camera.get_depth_data()
         return self.depth_data
 
-<<<<<<< HEAD
-    def yolo_stacking(self):
-        row_axis=
-        column_axis=
-        current_zaxis=
-        goal_zaxis=
-        box_height = 0.04
-        block_count=
-        count = 0
-        depth_data = self.get_depth()
-
-        while(block_count!=0):
-            self.pick_and_place(row_axis, column_axis, current_zaxis-depth_data, goal_zaxis)
-            goal_zaxis = 0.78 + (count * box_height)
-=======
 
     def yolo_stacking(self):
 
@@ -436,7 +396,7 @@ class MoveGroupPythonInterfaceTutorial(object):
         block_count = detect.count
         block_list = detect.blocks
         print("block_list: ", block_list)
-        #
+        
         i = 0
         while i < block_count:
             x = block_list[2 * i + 1]
@@ -474,7 +434,6 @@ def yolo_stacking():
     # while(block_count!=0):
     #     #self.pick_and_place(row_axis, column_axis, current_zaxis-depth_data, goal_zaxis)
     #     goal_zaxis = 0.78 + (count * box_height)
->>>>>>> getting depth data
 
 
 
@@ -490,11 +449,7 @@ def main():
         # execute 메서드를 호출하여 데이터 수집 시작
         #depth_camera.execute()
         
-<<<<<<< HEAD
-        get_depth()
-=======
         #get_depth()
->>>>>>> getting depth data
 
         input(
             "============ Press `Enter` to initialize the pose of robot ..."
@@ -505,13 +460,8 @@ def main():
         tutorial.gripper_open()
 
         input("============ Press `Enter` to stack...")
-<<<<<<< HEAD
-        tutorial.stack(3,2)
-
-=======
         #tutorial.get_axis()
         tutorial.pick_and_place(0.7,0.1,0.78,0.78)
->>>>>>> getting depth data
 
 
         print("============ Python tutorial demo complete!")
