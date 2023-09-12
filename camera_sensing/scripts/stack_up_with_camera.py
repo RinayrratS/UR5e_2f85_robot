@@ -2,7 +2,7 @@
 
 # Python 2/3 compatibility imports
 from __future__ import print_function
-from six.moves import input
+#from six.moves import input
 from get_data import Depth_Camera
 from detect_simple import DetectionResult
 
@@ -316,6 +316,45 @@ class MoveGroupPythonInterfaceTutorial(object):
         #if initial_pose.position.x == length1 and initial_pose.position.y == length2:
 
 
+    def yolo_pick_and_place(self, xaxis: object, yaxis: object, zaxis: object, goal_zaxis: object) -> object:
+
+        self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
+
+        detect = DetectionResult()
+        opt = detect.parse_opt()
+        detect.detect_simple(**vars(opt))
+        block_list = []
+        while len(block_list) == 0:
+            print("Detecting with yolov5")
+            detect.detect_simple(**vars(opt))
+            block_list = detect.blocks
+            time.sleep(1)
+        x_center = 0.82
+        y_center = 0.65
+
+        x_diff = round((block_list[1] - x_center)/0.278, 2) 
+        y_diff = round((block_list[0] - y_center)/0.4, 2) 
+
+        xaxis -= x_diff
+        yaxis -= y_diff
+
+        print("modified axis: ", xaxis, yaxis, zaxis, goal_zaxis)
+
+        self.linear_motion_absolute(xaxis, yaxis, zaxis)
+        self.gripper_close()
+        self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
+        #initial_pose = self.move_group.get_current_pose().pose
+
+        self.go_to_goal_state(goal_zaxis + 0.15)
+        self.go_to_goal_state(goal_zaxis + 0.0015)
+        self.gripper_open()
+        self.go_to_goal_state(goal_zaxis + 0.15)
+        time.sleep(2)
+
+        #final_pose = self.move_group.get_current_pose().pose
+        #if initial_pose.position.x == length1 and initial_pose.position.y == length2:
+
+
 
     def stack(self, rows: object, columns: object) -> object:
 
@@ -345,33 +384,6 @@ class MoveGroupPythonInterfaceTutorial(object):
             row_num += 1
 
 
-    def yolo_stack(self, x_axis: object, y_axis: object, z_axis: object, goal_z: object) -> object:
-
-        row_num = 0
-        column_num = 0
-        count = 0
-        box_height = 0.04
-        goal_height = 0.78
-
-        # initial axis
-        row_length = 0.5
-
-        while row_num < rows:
-            column_num = 0
-            column_length = -0.1
-            row_length += row_num * 0.1
-
-            while column_num < columns:
-                column_length += column_num * 0.1
-
-                self.pick_and_place(row_length, column_length, 0.78, goal_height)
-                column_num += 1
-                count += 1
-                print(count, "block pick and place complete!")
-                goal_height = 0.78 + (count * box_height)
-                input("============ Press `Enter` to move on")
-            row_num += 1
-
 
     def execute_data():
         # while 추가해야함
@@ -391,19 +403,25 @@ class MoveGroupPythonInterfaceTutorial(object):
         detect = DetectionResult()
         opt = detect.parse_opt()
         detect.detect_simple(**vars(opt))
-        block_count = detect.count
-        block_list = detect.blocks
+        block_count = 0
+        block_list = []
+        while len(block_list) == 0:
+            print("Detecting with yolov5")
+            detect.detect_simple(**vars(opt))
+            block_count = detect.count
+            block_list = detect.blocks
+            time.sleep(1)
         print("block_list: ", block_list)
         
         i = 0
         while i < block_count:
-            x = block_list[2 * i + 1] - 0.18
-            y = block_list[2 * i] - 0.88
+            x = round((block_list[2 * i + 1] * (-0.278)) + 0.725, 2)
+            y = round((block_list[2 * i] * (-0.4)) + 0.352, 2)
             z = 0.78
             box_height = 0.04
             goal_z = 0.78 + (box_height * i)
             print("axis: ", x, y, z, goal_z)
-            self.pick_and_place(x, y, z, goal_z)            
+            self.yolo_pick_and_place(x, y, z, goal_z)            
             i += 1  
         #return
 
@@ -415,6 +433,7 @@ class MoveGroupPythonInterfaceTutorial(object):
         detect.detect_simple(**vars(opt))
         block_count = detect.count
         block_list = detect.blocks
+
         print("block_list: ", block_list)
         
         i = 0
@@ -479,8 +498,8 @@ def main():
         tutorial.gripper_open()
 
         input("============ Press `Enter` to stack...")
-        tutorial.get_axis()
-        # tutorial.yolo_stacking()
+        # tutorial.get_axis()
+        tutorial.yolo_stacking()
 
 
         print("============ Python tutorial demo complete!")
