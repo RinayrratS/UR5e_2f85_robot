@@ -165,7 +165,7 @@ class DetectionResult:
                     self.blocks.append(self.center_y)
                     #self.blocks[2*self.count] = self.center_x
                     #self.blocks[2*self.count + 1] = self.center_y
-                    print(self.center_x, self.center_y)
+                    print('axis: ',self.center_x, self.center_y)
                     self.count += 1
                     
                     
@@ -217,8 +217,8 @@ class DetectionResult:
 
             # Print time (inference-only)
             #LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
-            #dataset.release()
-            #return
+            dataset.release()
+            return
         
             
             
