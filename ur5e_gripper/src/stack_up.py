@@ -359,7 +359,7 @@ def main():
         tutorial.gripper_open()
 
         input("============ Press `Enter` to stack...")
-        tutorial.stack(3,2)
+        tutorial.stack(5,5)
 
 
 

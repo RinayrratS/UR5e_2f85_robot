@@ -1,5 +1,3 @@
-#stack_up_with_camera.py
-
 #!/usr/bin/env python3
 
 # Python 2/3 compatibility imports
@@ -399,8 +397,8 @@ class MoveGroupPythonInterfaceTutorial(object):
         
         i = 0
         while i < block_count:
-            x = block_list[2 * i + 1]
-            y = block_list[2 * i] - 0.1
+            x = block_list[2 * i + 1] - 0.18
+            y = block_list[2 * i] - 0.88
             z = 0.78
             box_height = 0.04
             goal_z = 0.78 + (box_height * i)
@@ -410,8 +408,29 @@ class MoveGroupPythonInterfaceTutorial(object):
         #return
 
 
+    def get_axis(self):
 
-def yolo_stacking():
+        detect = DetectionResult()
+        opt = detect.parse_opt()
+        detect.detect_simple(**vars(opt))
+        block_count = detect.count
+        block_list = detect.blocks
+        print("block_list: ", block_list)
+        
+        i = 0
+        while i < block_count:
+            x = block_list[2 * i + 1] - 0.18
+            y = block_list[2 * i] - 0.88
+            z = 0.78
+            box_height = 0.04
+            goal_z = 0.78 + (box_height * i)
+            print("axis: ", x, y, z, goal_z)           
+            i += 1  
+        #return
+
+
+
+def yolo_():
     detect = DetectionResult()
     opt = detect.parse_opt()
     detect.main(opt)
@@ -460,8 +479,8 @@ def main():
         tutorial.gripper_open()
 
         input("============ Press `Enter` to stack...")
-        #tutorial.get_axis()
-        tutorial.pick_and_place(0.7,0.1,0.78,0.78)
+        tutorial.get_axis()
+        # tutorial.yolo_stacking()
 
 
         print("============ Python tutorial demo complete!")

@@ -110,6 +110,13 @@ class DetectionResult:
                 visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if visualize else False
                 pred = model(im, augment=augment, visualize=visualize)
 
+            # # Inference
+            # with dt[1]:
+            #     with torch.no_grad:
+            #         visualize = increment_path(save_dir / Path(path).stem, mkdir=True) if visualize else False
+            #         pred = model(im, augment=augment, visualize=visualize)
+
+
             # NMS
             with dt[2]:
                 pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
@@ -176,7 +183,7 @@ class DetectionResult:
                     if save_crop:
                         save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                     #print(xywh[0], xywh[1], xywh[2], xywh[3])
-                print(self.count)
+                #print(self.count)
 
 
                 # # Stream results
@@ -209,9 +216,9 @@ class DetectionResult:
                 #         vid_writer[i].write(im0)
 
             # Print time (inference-only)
-            LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
-            dataset.release()
-            return
+            #LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
+            #dataset.release()
+            #return
         
             
             
@@ -422,7 +429,7 @@ class DetectionResult:
     def parse_opt(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('--weights', nargs='+', type=str, default=ROOT/'weights/best.pt', help='model path or triton URL')
-        parser.add_argument('--source', type=str, default='0', help='file/dir/URL/glob/screen/0(webcam)')
+        parser.add_argument('--source', type=str, default='6', help='file/dir/URL/glob/screen/0(webcam)')
         parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
         parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
         parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')
