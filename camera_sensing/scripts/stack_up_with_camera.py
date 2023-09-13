@@ -175,6 +175,32 @@ class MoveGroupPythonInterfaceTutorial(object):
         print(current_joint)
         print(all_close(joint_goal, current_joint, 0.01))
 
+    def go_to_detect_state(self) -> object:
+
+        pose_goal = self.move_group.get_current_pose().pose
+
+        pose_goal.position.z = 1.2
+
+
+        print("============ Goal position")
+        print("z_axis: ", pose_goal.position.z)
+        print("")
+
+        self.move_group.set_pose_target(pose_goal)
+
+        ## Now, we call the planner to compute the plan and execute it.
+        # `go()` returns a boolean indicating whether the planning and execution was successful.
+        success = self.move_group.go(wait=True)
+        # Calling `stop()` ensures that there is no residual movement
+        self.move_group.stop()
+        # It is always good to clear your targets after planning with poses.
+        # Note: there is no equivalent function for clear_joint_value_targets().
+        self.move_group.clear_pose_targets()
+        current_pose = self.move_group.get_current_pose().pose
+        time.sleep(2)
+        print(current_pose)
+        print(all_close(pose_goal, current_pose, 0.005))
+
 
     def go_to_pose_goal(self):
         # Copy class variables to local variables to make the web tutorials more clear.
@@ -316,32 +342,53 @@ class MoveGroupPythonInterfaceTutorial(object):
         #if initial_pose.position.x == length1 and initial_pose.position.y == length2:
 
 
+    # def list_modify(self, list=[], n=int):
+        
+
+
     def yolo_pick_and_place(self, xaxis: object, yaxis: object, zaxis: object, goal_zaxis: object) -> object:
 
-        self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
+        self.linear_motion_absolute(xaxis, yaxis, zaxis + 0.3)
 
         detect = DetectionResult()
         opt = detect.parse_opt()
         detect.detect_simple(**vars(opt))
         block_list = []
+        
+        # 수치 재조정
         while len(block_list) == 0:
             print("Detecting with yolov5")
             detect.detect_simple(**vars(opt))
             block_list = detect.blocks
+            block_count = detect.count
+            print(block_list)
             time.sleep(1)
         x_center = 0.82
         y_center = 0.65
 
-        x_diff = round((block_list[1] - x_center)/0.278, 2) 
-        y_diff = round((block_list[0] - y_center)/0.4, 2) 
+        # 가장 가까운 물체 찾기
+        i = 0
+        while i < block_count:
+            block_list[i-1][0] = (block_list[i-1][0] - x_center)*(0.25)
+            block_list[i-1][1] = (block_list[i-1][1] - y_center)*(0.4)
+            i+=1
+        block_list.sort()
 
-        xaxis -= x_diff
-        yaxis -= y_diff
+        x_diff = block_list[0][0]
+        y_diff = block_list[0][1]
+        print("input axis: ", xaxis, yaxis)
+        print("difference: ", x_diff, y_diff)
+
+        xaxis = round(xaxis - x_diff, 3)
+        yaxis = round(yaxis - y_diff, 3)
 
         print("modified axis: ", xaxis, yaxis, zaxis, goal_zaxis)
+        self.linear_motion_absolute(xaxis, yaxis, zaxis + 0.3)
 
         self.linear_motion_absolute(xaxis, yaxis, zaxis)
+
         self.gripper_close()
+
         self.linear_motion_absolute(xaxis, yaxis, goal_zaxis + 0.15)
         #initial_pose = self.move_group.get_current_pose().pose
 
@@ -404,19 +451,21 @@ class MoveGroupPythonInterfaceTutorial(object):
         opt = detect.parse_opt()
         detect.detect_simple(**vars(opt))
         block_count = 0
-        block_list = []
-        while len(block_list) == 0:
+        block_list = [[0,0]]
+        while block_list == [[0,0]]:
             print("Detecting with yolov5")
             detect.detect_simple(**vars(opt))
             block_count = detect.count
             block_list = detect.blocks
             time.sleep(1)
-        print("block_list: ", block_list)
+        print("block_list: ", block_list, block_count)
+        block_list.sort()
+        print(block_list)
         
         i = 0
         while i < block_count:
-            x = round((block_list[2 * i + 1] * (-0.278)) + 0.725, 2)
-            y = round((block_list[2 * i] * (-0.4)) + 0.352, 2)
+            x = round((block_list[i][0] * (-0.37)) + 0.763, 3)
+            y = round((block_list[i][1] * (-0.5)) + 0.405, 3)
             z = 0.78
             box_height = 0.04
             goal_z = 0.78 + (box_height * i)
@@ -489,16 +538,18 @@ def main():
         
         #get_depth()
 
-        input(
-            "============ Press `Enter` to initialize the pose of robot ..."
-        )
+        # input(
+        #     "============ Press `Enter` to initialize the pose of robot ..."
+        # )
         tutorial = MoveGroupPythonInterfaceTutorial()
 
         tutorial.go_to_home_state()
         tutorial.gripper_open()
 
-        input("============ Press `Enter` to stack...")
+        #input("============ Press `Enter` to detect...")
+        tutorial.go_to_detect_state()
         # tutorial.get_axis()
+        input("============ Press `Enter` to stack...")
         tutorial.yolo_stacking()
 
 
